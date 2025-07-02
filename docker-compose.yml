@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  tomcat:
+    container_name: backend
+    build:
+      context: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      - username=Jean
+      - password=piero123
+    networks:
+      - network_bridge
+
+  node:
+    container_name: frontend
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - network_bridge
+
+networks:
+  network_bridge:
+    driver: bridge
