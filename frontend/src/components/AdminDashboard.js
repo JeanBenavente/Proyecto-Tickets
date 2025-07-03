@@ -61,16 +61,34 @@ function AdminDashboard() {
     }
   }, [filterType, tickets]);
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!chatInput.trim()) return;
+
     setChatMessages([...chatMessages, { from: "user", text: chatInput }]);
+    const userMessage = chatInput;
     setChatInput("");
-    setTimeout(() => {
+
+    try {
+      const response = await fetch("http://localhost:8080/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: userMessage }),
+      });
+
+      const data = await response.text();
+
       setChatMessages((msgs) => [
         ...msgs,
-        { from: "gemini", text: "Respuesta de Gemini (simulado)" },
+        { from: "gemini", text: data },
       ]);
-    }, 1000);
+    } catch (error) {
+      setChatMessages((msgs) => [
+        ...msgs,
+        { from: "gemini", text: "Hubo un error al contactar a Gemini." },
+      ]);
+    }
   };
 
   if (!userData) return null;
