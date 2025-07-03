@@ -66,6 +66,12 @@
 			<artifactId>jakarta.servlet-api</artifactId>
 			<version>6.0.0</version>
 		</dependency>
+				<!-- Cliente HTTP para llamadas a Gemini -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
 
 	</dependencies>
 
