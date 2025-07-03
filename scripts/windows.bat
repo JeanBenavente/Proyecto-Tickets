@@ -12,8 +12,6 @@ cd ./backend
 
 mvn clean || goto :error
 
-cd ..
-
 goto :end
 
 :error
@@ -21,3 +19,5 @@ echo An error occurred during the execution of the script.
 pause
 
 :end
+
+cd ..
