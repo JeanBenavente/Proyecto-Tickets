@@ -5,6 +5,9 @@ import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Submit from './components/Submit';
+import { ToastContainer } from 'react-toastify';
+
+
 
 function App() {
   return (
@@ -18,8 +21,10 @@ function App() {
           <Route path='/admin-dashboard' element={<AdminDashboard/>}/>
         </Routes>
       </Router>
+      <ToastContainer position="top-center" autoClose={3000} />
     </div>
   );
 }
+
 
 export default App;

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from 'react-toastify';
 import NavBar from "./Navbar";
 import {
   Form,
@@ -40,27 +41,39 @@ function Submit() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const submitTicket = async (event) => {
+    const submitTicket = async (event) => {
     event.preventDefault();
 
     if (!checkForm()) {
-      alert("Por favor completa todo el formulario.");
-      return;
+        toast.error("❗ Completa todos los campos.");
+        return;
     }
 
     try {
-      await fetch("http://localhost:8080/ticket-api/create-ticket", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+        const response = await fetch("http://localhost:8080/ticket-api/create-ticket", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+        });
 
-      toaster.push(message, { duration: 3000 });
-      navigate("/");
+        if (response.ok) {
+        toast.success('✅ Ticket enviado correctamente.');
+
+        // ⏳ Espera 3.5 segundos antes de redirigir
+        setTimeout(() => {
+            navigate("/");
+        }, 3500);
+        } else {
+        toast.error("❌ Error al enviar el ticket.");
+        }
     } catch (error) {
-      console.log("Error: " + error);
+        console.error("Error:", error);
+        toast.error("⚠️ Error de red al enviar el ticket.");
     }
-  };
+    };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-sky-100">

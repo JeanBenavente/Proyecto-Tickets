@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from 'react-toastify';
 import NavBar from "./Navbar";
 import {
   Form,
@@ -48,9 +49,9 @@ function Login() {
 
   const checkInputs = () => username !== "" && password !== "";
 
-  const login = async () => {
+    const login = async () => {
     if (!checkInputs()) {
-      alert("Por favor completa ambos campos.");
+      toast.error("⚠️ Por favor completa ambos campos.");
       return;
     }
 
@@ -73,10 +74,11 @@ function Login() {
           state: { data: await response.json() },
         });
       } else {
-        alert("Credenciales inválidas");
+        toast.error("Credenciales inválidas. Intenta nuevamente.");
       }
     } catch (error) {
       console.log("Error: " + error);
+      toast.error("⚠️ Error en el servidor. Inténtalo más tarde.");
     }
   };
 
