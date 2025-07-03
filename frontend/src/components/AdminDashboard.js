@@ -1,4 +1,9 @@
-import { useEffect, useState } from "react";
+// Cambios clave realizados:
+// 1. Chat ahora es desplegable con Accordion (rsuite).
+// 2. Auto-scroll hacia el final.
+// 3. Envío con Enter.
+
+import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Sidenav,
@@ -8,6 +13,8 @@ import {
   Tag,
   Input,
   Button,
+  Accordion,
+  Panel,
 } from "rsuite";
 import DashboardIcon from "@rsuite/icons/legacy/Dashboard";
 import GroupIcon from "@rsuite/icons/legacy/Group";
@@ -28,6 +35,7 @@ function AdminDashboard() {
 
   const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
+  const chatEndRef = useRef(null);
 
   const ticketTypeOptions = [
     { label: "Todos", value: null },
@@ -61,9 +69,12 @@ function AdminDashboard() {
     }
   }, [filterType, tickets]);
 
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages]);
+
   const sendMessage = async () => {
     if (!chatInput.trim()) return;
-
     setChatMessages([...chatMessages, { from: "user", text: chatInput }]);
     const userMessage = chatInput;
     setChatInput("");
@@ -78,16 +89,19 @@ function AdminDashboard() {
       });
 
       const data = await response.text();
-
-      setChatMessages((msgs) => [
-        ...msgs,
-        { from: "gemini", text: data },
-      ]);
+      setChatMessages((msgs) => [...msgs, { from: "gemini", text: data }]);
     } catch (error) {
       setChatMessages((msgs) => [
         ...msgs,
         { from: "gemini", text: "Hubo un error al contactar a Gemini." },
       ]);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
     }
   };
 
@@ -101,17 +115,12 @@ function AdminDashboard() {
       />
 
       <div className="flex">
-        {/* Sidebar */}
         <div className="w-60 h-screen border-r border-gray-200 bg-white shadow-sm">
           <Sidenav defaultOpenKeys={["3", "4"]} appearance="subtle">
             <Sidenav.Body>
               <Nav activeKey="1" className="pt-4">
-                <Nav.Item eventKey="1" icon={<DashboardIcon />}>
-                  Dashboard
-                </Nav.Item>
-                <Nav.Item eventKey="2" icon={<GroupIcon />}>
-                  User Group
-                </Nav.Item>
+                <Nav.Item eventKey="1" icon={<DashboardIcon />}>Dashboard</Nav.Item>
+                <Nav.Item eventKey="2" icon={<GroupIcon />}>User Group</Nav.Item>
                 <Nav.Menu eventKey="3" title="Advanced" icon={<MagicIcon />}>
                   <Nav.Item eventKey="3-1">Geo</Nav.Item>
                   <Nav.Item eventKey="3-2">Devices</Nav.Item>
@@ -124,9 +133,7 @@ function AdminDashboard() {
           </Sidenav>
         </div>
 
-        {/* Main Content and Chat */}
         <div className="flex-1 p-6 flex gap-6">
-          {/* Tickets */}
           <div className="w-3/4">
             <h2 className="text-3xl font-bold text-sky-700 mb-6">
               🎫 Listado de Tickets
@@ -143,43 +150,31 @@ function AdminDashboard() {
             </div>
 
             <div className="bg-white rounded-xl shadow-md p-4">
-              <Table
-                data={filteredTickets}
-                bordered
-                hover
-                autoHeight
-                className="rounded-md"
-              >
+              <Table data={filteredTickets} bordered hover autoHeight>
                 <Column width={80} align="center" fixed>
                   <HeaderCell>ID</HeaderCell>
                   <Cell dataKey="id" />
                 </Column>
-
                 <Column width={160} align="center">
                   <HeaderCell>Nombre</HeaderCell>
                   <Cell>{(row) => `${row.firstName} ${row.lastName}`}</Cell>
                 </Column>
-
                 <Column width={200} align="center">
                   <HeaderCell>Email</HeaderCell>
                   <Cell dataKey="email" />
                 </Column>
-
                 <Column width={150} align="center">
                   <HeaderCell>Tipo</HeaderCell>
                   <Cell dataKey="ticketType" />
                 </Column>
-
                 <Column width={250} align="center">
                   <HeaderCell>Descripción</HeaderCell>
                   <Cell dataKey="description" />
                 </Column>
-
                 <Column width={140} align="center">
                   <HeaderCell>Fecha</HeaderCell>
                   <Cell dataKey="submittedDate" />
                 </Column>
-
                 <Column width={140} align="center">
                   <HeaderCell>Estado</HeaderCell>
                   <Cell>
@@ -198,33 +193,36 @@ function AdminDashboard() {
 
           {/* Chat con Gemini */}
           <div className="w-1/4 bg-white shadow-lg rounded-xl border border-sky-100 flex flex-col">
-            <div className="p-4 border-b border-sky-100 text-sky-700 font-bold text-lg">
-              🤖 Chat con Gemini
-            </div>
-            <div className="flex-1 p-4 overflow-y-auto space-y-2 text-sm">
-              {chatMessages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`p-2 rounded-md max-w-xs ${
-                    msg.from === "user"
-                      ? "bg-blue-100 text-right self-end"
-                      : "bg-gray-100 text-left"
-                  }`}
-                >
-                  {msg.text}
+            <Accordion defaultActiveKey="1">
+              <Panel header="🤖 Chat con Gemini" eventKey="1">
+                <div className="flex-1 overflow-y-auto space-y-2 text-sm max-h-[60vh] pb-4">
+                  {chatMessages.map((msg, idx) => (
+                    <div
+                      key={idx}
+                      className={`p-2 rounded-md max-w-xs mx-2 break-words whitespace-pre-wrap ${
+                        msg.from === "user"
+                          ? "bg-blue-100 text-right self-end ml-auto"
+                          : "bg-gray-100 text-left"
+                      }`}
+                    >
+                      {msg.text}
+                    </div>
+                  ))}
+                  <div ref={chatEndRef}></div>
                 </div>
-              ))}
-            </div>
-            <div className="p-4 border-t border-sky-100 flex gap-2">
-              <Input
-                value={chatInput}
-                onChange={setChatInput}
-                placeholder="Escribe tu pregunta..."
-              />
-              <Button onClick={sendMessage} appearance="primary">
-                Enviar
-              </Button>
-            </div>
+                <div className="flex gap-2 px-2 pt-2 border-t border-sky-100">
+                  <Input
+                    value={chatInput}
+                    onChange={setChatInput}
+                    onKeyDown={handleKeyPress}
+                    placeholder="Escribe tu pregunta..."
+                  />
+                  <Button onClick={sendMessage} appearance="primary">
+                    Enviar
+                  </Button>
+                </div>
+              </Panel>
+            </Accordion>
           </div>
         </div>
       </div>

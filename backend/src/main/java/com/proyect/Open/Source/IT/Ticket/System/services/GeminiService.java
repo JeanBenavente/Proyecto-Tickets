@@ -48,17 +48,12 @@ public class GeminiService {
 
             String responseBody = response.body().string();
 
-            // Parseamos el JSON para extraer solo el texto de la respuesta
-            JsonNode root = objectMapper.readTree(responseBody);
-            JsonNode textNode = root
-                    .path("candidates")
-                    .path(0)
-                    .path("content")
-                    .path("parts")
-                    .path(0)
-                    .path("text");
+            // Parsear JSON con Jackson
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(responseBody);
+            JsonNode textNode = root.path("candidates").get(0).path("content").path("parts").get(0).path("text");
 
-            return textNode.asText("No se pudo obtener respuesta de Gemini.");
+            return textNode.asText(); // Devuelve solo el texto generado por Gemini
         }
     }
 }
