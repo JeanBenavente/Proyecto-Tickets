@@ -1,0 +1,15 @@
+com\proyect\Open\Source\IT\Ticket\System\repository\UserRepository.class
+com\proyect\Open\Source\IT\Ticket\System\services\TicketService.class
+com\proyect\Open\Source\IT\Ticket\System\models\Users\User.class
+com\proyect\Open\Source\IT\Ticket\System\controllers\ChatRequest.class
+com\proyect\Open\Source\IT\Ticket\System\controllers\TicketController.class
+com\proyect\Open\Source\IT\Ticket\System\dtos\UserDto.class
+com\proyect\Open\Source\IT\Ticket\System\services\UserService.class
+com\proyect\Open\Source\IT\Ticket\System\models\Tickets\TicketType.class
+com\proyect\Open\Source\IT\Ticket\System\repository\TicketRepository.class
+com\proyect\Open\Source\IT\Ticket\System\controllers\ChatController.class
+com\proyect\Open\Source\IT\Ticket\System\OpenSourceItTicketSystemApplication.class
+com\proyect\Open\Source\IT\Ticket\System\services\GeminiService.class
+com\proyect\Open\Source\IT\Ticket\System\controllers\UserController.class
+com\proyect\Open\Source\IT\Ticket\System\dtos\LoginDto.class
+com\proyect\Open\Source\IT\Ticket\System\models\Tickets\Ticket.class
